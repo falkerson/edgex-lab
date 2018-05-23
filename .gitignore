@@ -1,3 +1,4 @@
+.ssh
 .terraform
 terraform.tfstate*
 account.json
