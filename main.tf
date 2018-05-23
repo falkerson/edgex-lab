@@ -14,7 +14,7 @@ resource "google_compute_firewall" "www" {
 
   allow {
     protocol = "tcp"
-    ports    = ["80"]
+    ports    = ["80", "8080", "8000", "8500"]
   }
 
   source_ranges = ["0.0.0.0/0"]
@@ -34,6 +34,18 @@ resource "google_compute_instance" "www" {
     }
   }
 
+  provisioner "file" {
+    connection {
+      type        = "ssh"
+      user        = "root"
+      private_key = "${file("${var.private_key_path}")}"
+      agent       = false
+    }
+
+    source      = "files/docker-compose-0.5.2.yaml"
+    destination = "/etc/docker-compose.yaml"
+  }
+
   provisioner "remote-exec" {
     connection {
       type        = "ssh"
@@ -44,7 +56,9 @@ resource "google_compute_instance" "www" {
 
     scripts = [
       "scripts/install_docker.sh",
-      "scripts/install_nginx.sh"
+      "scripts/install_docker_compose.sh",
+      "scripts/install_nginx.sh",
+      "scripts/install_edgex.sh"
     ]
   }
   
